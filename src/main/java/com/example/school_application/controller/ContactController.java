@@ -2,6 +2,7 @@ package com.example.school_application.controller;
 
 import com.example.school_application.model.Contact;
 import com.example.school_application.service.ContactService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ContactController {
   }
 
   @GetMapping("/{filter}")
-  public ResponseEntity<List<Contact>> getContacts(@PathVariable String filter) {
+  public ResponseEntity<List<Contact>> getContacts(@Valid @PathVariable String filter) {
     System.out.println("filter" + filter);
     if (filter.equals("all")) {
       return ResponseEntity.ok().body(contactService.getAllContacts());
@@ -32,7 +33,7 @@ public class ContactController {
   }
 
   @PostMapping(path = "")
-  public ResponseEntity<Boolean> saveContact(@RequestBody Contact contact) {
+  public ResponseEntity<Boolean> saveContact(@Valid @RequestBody Contact contact) {
     boolean isSaved = contactService.saveContact(contact);
     return ResponseEntity.ok().body(isSaved);
   }
