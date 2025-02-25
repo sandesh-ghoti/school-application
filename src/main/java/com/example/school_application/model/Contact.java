@@ -1,15 +1,28 @@
 package com.example.school_application.model;
 
 import com.example.school_application.utils.Constants.Status;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Contact extends BaseEntity {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int contactId;
 
   @NotBlank(message = "Name must not be blank")
