@@ -1,10 +1,9 @@
 package com.example.school_application.controller;
 
 import com.example.school_application.model.Holiday;
-import com.example.school_application.model.Holiday.Type;
 import com.example.school_application.service.HolidayService;
+import com.example.school_application.utils.Constants.Type;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HolidayController {
   private final HolidayService holidayService;
 
-  @Autowired
   public HolidayController(HolidayService holidayService) {
     this.holidayService = holidayService;
   }

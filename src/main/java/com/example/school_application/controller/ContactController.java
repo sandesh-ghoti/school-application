@@ -4,7 +4,6 @@ import com.example.school_application.model.Contact;
 import com.example.school_application.service.ContactService;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContactController {
   private final ContactService contactService;
 
-  @Autowired
   public ContactController(ContactService contactService) {
     this.contactService = contactService;
   }

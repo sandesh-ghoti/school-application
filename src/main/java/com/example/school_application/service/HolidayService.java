@@ -1,7 +1,7 @@
 package com.example.school_application.service;
 
 import com.example.school_application.model.Holiday;
-import com.example.school_application.model.Holiday.Type;
+import com.example.school_application.utils.Constants.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
