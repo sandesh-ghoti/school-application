@@ -1,6 +1,6 @@
 package com.example.school_application.controller;
 
-import com.example.school_application.model.Contact;
+import com.example.school_application.dto.ContactDto;
 import com.example.school_application.service.ContactService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,16 +22,16 @@ public class ContactController {
   }
 
   @GetMapping("/{filter}")
-  public ResponseEntity<List<Contact>> getContacts(@Valid @PathVariable String filter) {
+  public ResponseEntity<List<ContactDto>> getContacts(@Valid @PathVariable String filter) {
     System.out.println("filter" + filter);
     if (filter.equals("all")) {
       return ResponseEntity.ok().body(contactService.getAllContacts());
     }
-    return ResponseEntity.ok().body(contactService.getContact(filter));
+    return ResponseEntity.ok().body(List.of(contactService.getContact(Long.parseLong(filter))));
   }
 
   @PostMapping(path = "")
-  public ResponseEntity<Boolean> saveContact(@Valid @RequestBody Contact contact) {
+  public ResponseEntity<Boolean> saveContact(@Valid @RequestBody ContactDto contact) {
     boolean isSaved = contactService.saveContact(contact);
     return ResponseEntity.ok().body(isSaved);
   }

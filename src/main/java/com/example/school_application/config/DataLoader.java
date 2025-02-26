@@ -20,7 +20,9 @@ public class DataLoader {
     List<Roles> roles = List.of(Roles.USER, Roles.ADMIN);
     for (Roles role : roles) {
       if (roleRepository.findByName(role).isEmpty()) {
-        roleRepository.save(new Role(role));
+        Role newRole = new Role();
+        newRole.setName(role);
+        roleRepository.save(newRole);
       }
     }
   }

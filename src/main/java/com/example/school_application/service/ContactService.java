@@ -1,41 +1,52 @@
 package com.example.school_application.service;
 
+import com.example.school_application.dto.ContactDto;
+import com.example.school_application.exception.ResourceNotFoundException;
+import com.example.school_application.mapper.ContactMapper;
 import com.example.school_application.model.Contact;
+import com.example.school_application.repository.ContactRepository;
 import jakarta.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
+import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 interface IContactService {
-  public List<Contact> getAllContacts();
+  public List<ContactDto> getAllContacts();
 
-  public List<Contact> getContact(String mobileno);
+  public ContactDto getContact(Long id);
 
-  public boolean saveContact(Contact contact);
+  public boolean saveContact(ContactDto contactDto);
 }
 
-@Component
+@Service
 public class ContactService implements IContactService {
-  private List<Contact> contacts = new ArrayList<>();
+  private final ContactRepository contactRepository;
 
-  @Override
-  public List<Contact> getAllContacts() {
-    return contacts;
+  public ContactService(ContactRepository contactRepository) {
+    this.contactRepository = contactRepository;
   }
 
   @Override
-  public List<Contact> getContact(String mobileno) {
-    List<Contact> contact =
-        contacts.stream()
-            .filter(c -> c.getMobileno().equals(mobileno))
-            .collect(Collectors.toList());
-    return contact;
+  public List<ContactDto> getAllContacts() {
+    List<Contact> contacts = contactRepository.findAll();
+
+    return contacts.stream().map(ContactMapper::toContactDto).toList();
   }
 
   @Override
-  public boolean saveContact(@Valid Contact contact) {
-    contacts.add(contact);
+  public ContactDto getContact(Long id) {
+    Optional<Contact> contact = contactRepository.findById(id);
+
+    if (contact.isEmpty()) {
+      throw new ResourceNotFoundException("Contact", "id", id.toString());
+    }
+    return ContactMapper.toContactDto(contact.get());
+  }
+
+  @Override
+  public boolean saveContact(@Valid ContactDto contactDto) {
+
+    contactRepository.save(ContactMapper.toContact(contactDto));
     return true;
   }
 }
