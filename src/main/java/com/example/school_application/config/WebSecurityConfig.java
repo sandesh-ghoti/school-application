@@ -1,8 +1,11 @@
 package com.example.school_application.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.example.school_application.utils.Constants.Roles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -22,10 +25,12 @@ public class WebSecurityConfig {
         .csrf(t -> t.disable())
         .authorizeHttpRequests(
             t -> {
-              // t.requestMatchers(HttpMethod.GET, "/contact/**").authenticated();
+              t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
               // t.requestMatchers(PathRequest.toH2Console()).permitAll();
               t.anyRequest().permitAll();
             });
+    httpSecurity.formLogin(withDefaults());
+    httpSecurity.httpBasic(withDefaults());
     httpSecurity.headers(h -> h.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));
     return httpSecurity.build();
   }
