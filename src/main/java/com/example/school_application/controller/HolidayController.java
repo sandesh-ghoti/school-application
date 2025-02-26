@@ -1,6 +1,6 @@
 package com.example.school_application.controller;
 
-import com.example.school_application.model.Holiday;
+import com.example.school_application.dto.HolidayDto;
 import com.example.school_application.service.HolidayService;
 import com.example.school_application.utils.Constants.Type;
 import java.util.List;
@@ -22,17 +22,18 @@ public class HolidayController {
   }
 
   @GetMapping("/{filter}")
-  public ResponseEntity<List<Holiday>> getHolidays(@PathVariable Type filter) {
-    return ResponseEntity.ok().body(holidayService.getHolidays(filter));
+  public ResponseEntity<List<HolidayDto>> getHolidays(@PathVariable String filter) {
+    Type type = Type.valueOf(filter.toUpperCase());
+    return ResponseEntity.ok().body(holidayService.getHolidays(type));
   }
 
   @GetMapping("/")
-  public ResponseEntity<List<Holiday>> getAllHolidays() {
+  public ResponseEntity<List<HolidayDto>> getAllHolidays() {
     return ResponseEntity.ok().body(holidayService.getHolidays());
   }
 
   @PostMapping("/")
-  public ResponseEntity<Boolean> addHolidayEntity(@RequestBody Holiday holiday) {
-    return ResponseEntity.ok().body(holidayService.addHoliday(holiday));
+  public ResponseEntity<Boolean> addHolidayEntity(@RequestBody HolidayDto holidayDto) {
+    return ResponseEntity.ok().body(holidayService.addHoliday(holidayDto));
   }
 }

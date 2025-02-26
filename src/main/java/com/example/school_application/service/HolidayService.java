@@ -1,34 +1,35 @@
 package com.example.school_application.service;
 
+import com.example.school_application.dto.HolidayDto;
+import com.example.school_application.mapper.HolidayMapper;
 import com.example.school_application.model.Holiday;
+import com.example.school_application.repository.HolidayRepository;
 import com.example.school_application.utils.Constants.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
 public class HolidayService {
-  private final List<Holiday> holidays = new ArrayList<>();
+  private final HolidayRepository holidayRepository;
 
-  public List<Holiday> getHolidays(Type type) {
-    if (type == Type.FEDERAL) {
-      return holidays.stream()
-          .filter(holiday -> holiday.getType() == Type.FEDERAL)
-          .collect(Collectors.toList());
-    } else {
-      return holidays.stream()
-          .filter(holiday -> holiday.getType() == Type.FESTIVAL)
-          .collect(Collectors.toList());
-    }
+  public HolidayService(HolidayRepository holidayRepository) {
+    this.holidayRepository = holidayRepository;
   }
 
-  public List<Holiday> getHolidays() {
-    return holidays;
+  public List<HolidayDto> getHolidays(Type type) {
+    List<Holiday> holidays = holidayRepository.findByType(type);
+
+    return holidays.stream().map(HolidayMapper::toHolidayDto).collect(Collectors.toList());
   }
 
-  public boolean addHoliday(Holiday holiday) {
-    holidays.add(holiday);
-    return true;
+  public List<HolidayDto> getHolidays() {
+    List<Holiday> holidays = holidayRepository.findAll();
+    return holidays.stream().map(HolidayMapper::toHolidayDto).toList();
+  }
+
+  public boolean addHoliday(HolidayDto holidayDto) {
+    Holiday holiday = holidayRepository.save(HolidayMapper.toHoliday(holidayDto));
+    return holiday == null ? false : true;
   }
 }

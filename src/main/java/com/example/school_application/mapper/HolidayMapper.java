@@ -14,6 +14,7 @@ public class HolidayMapper {
 
   public static HolidayDto toHolidayDto(Holiday holiday) {
     HolidayDto holidayDto = new HolidayDto();
+    holidayDto.setId(holiday.getId());
     holidayDto.setReason(holiday.getReason());
     holidayDto.setDay(holiday.getDay());
     holidayDto.setType(holiday.getType());

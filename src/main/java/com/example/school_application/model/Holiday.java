@@ -8,12 +8,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "holidays")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -23,7 +25,7 @@ public class Holiday extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(name = "holiday_day", unique = true, nullable = false)
   private String day;
 
   @Column(nullable = false)
