@@ -2,22 +2,32 @@ package com.example.school_application.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import com.example.school_application.utils.Constants.Roles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.example.school_application.repository.UserRepository;
+import com.example.school_application.utils.Constants.Roles;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
+  private final UserRepository userRepository;
+
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -29,6 +39,8 @@ public class WebSecurityConfig {
               // t.requestMatchers(PathRequest.toH2Console()).permitAll();
               t.anyRequest().permitAll();
             });
+    httpSecurity.sessionManagement(
+        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     httpSecurity.formLogin(withDefaults());
     httpSecurity.httpBasic(withDefaults());
     httpSecurity.headers(h -> h.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));
@@ -36,19 +48,27 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  InMemoryUserDetailsManager userDetailsManager() {
-    PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    UserDetails user =
-        User.withUsername("user")
-            .password(encoder.encode("password"))
-            .roles(Roles.USER.name())
-            .build();
-    UserDetails admin =
-        User.withUsername("admin")
-            .password(encoder.encode("admin"))
-            .roles(Roles.ADMIN.name())
-            .build();
-    return new InMemoryUserDetailsManager(user, admin);
+  @Bean
+  public UserDetailsService userDetailsService() {
+    return new UserDetailsService() {
+      @Override
+      public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        var user =
+            userRepository
+                .findByEmail(email)
+                .orElseThrow(
+                    () -> new UsernameNotFoundException("User not found with email: " + email));
+        return user;
+      }
+    };
+  }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+      throws Exception {
+    return authConfig.getAuthenticationManager();
   }
 }
