@@ -1,7 +1,9 @@
 package com.example.school_application.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -36,7 +38,8 @@ public class User implements UserDetails {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @NotBlank private String name;
+  @NotBlank
+  private String name;
 
   @Email
   @NotBlank
@@ -48,15 +51,19 @@ public class User implements UserDetails {
   private String password;
 
   @ManyToMany
-  @JoinTable(
-      name = "users_roles",
-      joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "roles_id"))
+  @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "roles_id"))
   private Set<Role> roles = new HashSet<>();
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.getName().name())).toList();
+    List<GrantedAuthority> authorities = new ArrayList<>(); // [...roles, ...permissions]
+    // add all roles
+    authorities.addAll(roles.stream()
+        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().name())).toList());
+    // now add all present roles assigned permissions
+    authorities.addAll(roles.stream().flatMap(role -> role.getPermissions().stream())
+        .map(permission -> new SimpleGrantedAuthority(permission.name())).toList());
+    return authorities;
   }
 
   @Override

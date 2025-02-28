@@ -10,6 +10,6 @@ import com.example.school_application.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-  @EntityGraph(attributePaths = "roles")
+  @EntityGraph(attributePaths = { "roles", "roles.permissions" })
   Optional<User> findByEmail(String email);
 }

@@ -3,11 +3,13 @@
   "java.configuration.updateBuildConfiguration": "automatic",
   "liveServer.settings.AdvanceCustomBrowserCmdLine": "",
   "[java]": {
-    "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code",
+    // "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code",
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
     },
-    "editor.formatOnSave": true
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "redhat.java"
   },
   "java.referencesCodeLens.enabled": true
 }

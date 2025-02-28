@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.school_application.repository.UserRepository;
+import com.example.school_application.utils.Constants.Permissions;
 import com.example.school_application.utils.Constants.Roles;
 
 import lombok.RequiredArgsConstructor;
@@ -28,17 +30,23 @@ import lombok.RequiredArgsConstructor;
 public class WebSecurityConfig {
   private final UserRepository userRepository;
 
+  /**
+   * GET contact can be accessed by admin only
+   * POST contact can be accessed by User only as it has USER_WRITE permission
+   * 
+   * @param httpSecurity
+   * @return
+   * @throws Exception
+   */
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-    httpSecurity
-        .csrf(t -> t.disable())
-        .authorizeHttpRequests(
-            t -> {
-              t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
-              // t.requestMatchers(PathRequest.toH2Console()).permitAll();
-              t.anyRequest().permitAll();
-            });
+    httpSecurity.csrf(t -> t.disable()).authorizeHttpRequests(t -> {
+      t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
+      t.requestMatchers(HttpMethod.POST, "/contact/**").hasAuthority(Permissions.USER_WRITE.name());
+      t.requestMatchers(HttpMethod.DELETE, "/contact/**").hasAuthority(Permissions.USER_DELETE.name());
+      t.anyRequest().permitAll();
+    });
     httpSecurity.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     httpSecurity.formLogin(withDefaults());
@@ -57,18 +65,18 @@ public class WebSecurityConfig {
     return new UserDetailsService() {
       @Override
       public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user =
-            userRepository
-                .findByEmail(email)
-                .orElseThrow(
-                    () -> new UsernameNotFoundException("User not found with email: " + email));
+        var user = userRepository.findByEmail(email).orElseThrow(
+            () -> new UsernameNotFoundException("User not found with email: " + email));
         return user;
       }
     };
   }
+
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
-      throws Exception {
-    return authConfig.getAuthenticationManager();
+  public AuthenticationManager authenticationManager() {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(userDetailsService());
+    authProvider.setPasswordEncoder(passwordEncoder());
+    return new ProviderManager(authProvider);
   }
 }
