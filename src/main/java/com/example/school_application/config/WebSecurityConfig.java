@@ -11,14 +11,11 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.school_application.repository.UserRepository;
 import com.example.school_application.utils.Constants.Permissions;
 import com.example.school_application.utils.Constants.Roles;
 
@@ -28,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+  private final UserDetailsService userDetailsService;
   private final UserRepository userRepository;
 
   /**
@@ -61,21 +59,9 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public UserDetailsService userDetailsService() {
-    return new UserDetailsService() {
-      @Override
-      public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with email: " + email));
-        return user;
-      }
-    };
-  }
-
-  @Bean
   public AuthenticationManager authenticationManager() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService());
+    authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder());
     return new ProviderManager(authProvider);
   }
