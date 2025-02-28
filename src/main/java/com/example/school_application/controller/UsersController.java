@@ -16,7 +16,7 @@ import com.example.school_application.dto.AuthRequest;
 import com.example.school_application.dto.AuthResponse;
 import com.example.school_application.dto.UserDto;
 import com.example.school_application.service.UserService;
-import com.example.school_application.utils.JWTUtils;
+import com.example.school_application.utils.RSAJWTUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class UsersController {
   private final UserService userService;
-  private final JWTUtils jwtUtils;
+  // private final JWTUtils jwtUtils;
+  private final RSAJWTUtils jwtUtils;
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
 
