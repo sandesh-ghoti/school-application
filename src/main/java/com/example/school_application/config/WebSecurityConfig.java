@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.school_application.utils.Constants.Permissions;
 import com.example.school_application.utils.Constants.Roles;
@@ -26,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
   private final UserDetailsService userDetailsService;
-  private final UserRepository userRepository;
+  private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
   /**
    * GET contact can be accessed by admin only
@@ -43,10 +44,12 @@ public class WebSecurityConfig {
       t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
       t.requestMatchers(HttpMethod.POST, "/contact/**").hasAuthority(Permissions.USER_WRITE.name());
       t.requestMatchers(HttpMethod.DELETE, "/contact/**").hasAuthority(Permissions.USER_DELETE.name());
+      t.requestMatchers(HttpMethod.GET, "/auth/**").hasRole(Roles.ADMIN.name());
       t.anyRequest().permitAll();
     });
     httpSecurity.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     httpSecurity.formLogin(withDefaults());
     httpSecurity.httpBasic(withDefaults());
     httpSecurity.headers(h -> h.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));

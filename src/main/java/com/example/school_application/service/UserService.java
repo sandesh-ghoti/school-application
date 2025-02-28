@@ -35,6 +35,11 @@ public class UserService {
     return users.stream().map(user -> UserMapper.toUserDto(user)).toList();
   }
 
+  public UserDto getUser(String email) {
+    var user = userRepository.findByEmail(email).get();
+    return UserMapper.toUserDto(user);
+  }
+
   public void appendRole(Roles role, String email) {
     var userRole = roleRepository.findByName(role).get();
     var user = userRepository.findByEmail(email).get();
