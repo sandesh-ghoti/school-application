@@ -15,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,11 +24,13 @@ import com.example.school_application.utils.Constants.Permissions;
 import com.example.school_application.utils.Constants.Roles;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class WebSecurityConfig {
   private final UserDetailsService userDetailsService;
   private final JWTAuthenticationFilter jwtAuthenticationFilter;
@@ -43,15 +47,24 @@ public class WebSecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
     httpSecurity.csrf(t -> t.disable()).authorizeHttpRequests(t -> {
-      t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
-      t.requestMatchers(HttpMethod.POST, "/contact/**").hasAuthority(Permissions.USER_WRITE.name());
-      t.requestMatchers(HttpMethod.DELETE, "/contact/**").hasAuthority(Permissions.USER_DELETE.name());
+      t.requestMatchers(HttpMethod.GET, "/contact/**").hasAnyAuthority(Roles.ADMIN.name(),
+          "SCOPE_" + Roles.ADMIN.name());
+      t.requestMatchers(HttpMethod.POST, "/contact/**").hasAnyAuthority(Permissions.USER_WRITE.name(),
+          "SCOPE_" + Permissions.USER_WRITE
+              .name());
+      t.requestMatchers(HttpMethod.DELETE, "/contact/**").hasAnyAuthority(Permissions.USER_DELETE.name(),
+          "SCOPE_" + Permissions.USER_DELETE);
       t.requestMatchers(HttpMethod.GET, "/auth/**").authenticated();
       t.anyRequest().permitAll();
     });
     httpSecurity.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    // httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+    httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+    httpSecurity.exceptionHandling(ex -> {
+      log.error("[SecurityConfig:apiSecurityFilterChain] Exception due to :{}", ex);
+      ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
+      ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
+    });
     httpSecurity.userDetailsService(userDetailsService);
     httpSecurity.addFilterBefore(jwtAuthenticationFilter,
         UsernamePasswordAuthenticationFilter.class);

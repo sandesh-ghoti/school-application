@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,9 +33,9 @@ public class UsersController {
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
 
+  @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'ADMIN')")
   @GetMapping("users")
-  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  public ResponseEntity<List<UserDto>> getAllUser() {
+  public ResponseEntity<List<UserDto>> getAllUser(Authentication authentication) {
     var users = userService.getAllUser();
     return ResponseEntity.ok().body(users);
   }

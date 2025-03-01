@@ -59,7 +59,7 @@ public class User implements UserDetails {
     List<GrantedAuthority> authorities = new ArrayList<>(); // [...roles, ...permissions]
     // add all roles
     authorities.addAll(roles.stream()
-        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().name())).toList());
+        .map(role -> new SimpleGrantedAuthority(role.getName().name())).toList());
     // now add all present roles assigned permissions
     authorities.addAll(roles.stream().flatMap(role -> role.getPermissions().stream())
         .map(permission -> new SimpleGrantedAuthority(permission.name())).toList());
