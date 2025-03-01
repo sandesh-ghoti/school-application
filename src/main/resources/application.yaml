@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: school-application
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  # h2:
+  #   console:
+  #     enabled: true
+logging:
+  level:
+    '[org.springframework.security]': TRACE
+jwt:
+  secret:
+    key: safjhiqworqewpr9ow8riewrjr-[jkhk]
+  expirationMs: 3600000
+  private:
+    key: classpath:app.key
+  public:
+    key: classpath:app.pub

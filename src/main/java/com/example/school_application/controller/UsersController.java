@@ -33,7 +33,7 @@ public class UsersController {
   private final UserDetailsService userDetailsService;
 
   @GetMapping("users")
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public ResponseEntity<List<UserDto>> getAllUser() {
     var users = userService.getAllUser();
     return ResponseEntity.ok().body(users);

@@ -25,7 +25,7 @@ public class RSAJWTUtils {
   public String generateToken(UserDetails userDetails) {
     Instant instant = Instant.now();
     JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder().subject(userDetails.getUsername())
-        .claim("roles", userDetails.getAuthorities().stream().map(authority -> authority.getAuthority()).toList())
+        .claim("scope", userDetails.getAuthorities().stream().map(authority -> authority.getAuthority()).toList())
         .issuedAt(instant).expiresAt(instant.plusMillis(expirationMs)).build();
     return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
   }

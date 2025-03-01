@@ -51,7 +51,10 @@ public class WebSecurityConfig {
     });
     httpSecurity.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    // httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+    httpSecurity.userDetailsService(userDetailsService);
+    httpSecurity.addFilterBefore(jwtAuthenticationFilter,
+        UsernamePasswordAuthenticationFilter.class);
     httpSecurity.formLogin(withDefaults());
     httpSecurity.httpBasic(withDefaults());
     httpSecurity.headers(h -> h.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));
