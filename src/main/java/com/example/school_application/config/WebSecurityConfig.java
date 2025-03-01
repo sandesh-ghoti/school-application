@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
   private final UserDetailsService userDetailsService;
@@ -44,7 +46,7 @@ public class WebSecurityConfig {
       t.requestMatchers(HttpMethod.GET, "/contact/**").hasRole(Roles.ADMIN.name());
       t.requestMatchers(HttpMethod.POST, "/contact/**").hasAuthority(Permissions.USER_WRITE.name());
       t.requestMatchers(HttpMethod.DELETE, "/contact/**").hasAuthority(Permissions.USER_DELETE.name());
-      t.requestMatchers(HttpMethod.GET, "/auth/**").hasRole(Roles.ADMIN.name());
+      t.requestMatchers(HttpMethod.GET, "/auth/**").authenticated();
       t.anyRequest().permitAll();
     });
     httpSecurity.sessionManagement(

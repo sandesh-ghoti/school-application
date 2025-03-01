@@ -3,6 +3,7 @@ package com.example.school_application.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,6 +32,7 @@ public class UsersController {
   private final UserDetailsService userDetailsService;
 
   @GetMapping("users")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserDto>> getAllUser() {
     var users = userService.getAllUser();
     return ResponseEntity.ok().body(users);
